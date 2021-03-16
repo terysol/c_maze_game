@@ -12,7 +12,7 @@ void textcolor(int color_number)
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color_number);
 }
 
-gotoxy(int x, int y) //gotoxy함수를 호출해올 기본함수.
+void gotoxy(int x, int y) //gotoxy함수를 호출해올 기본함수.
 {
 	COORD pos = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
@@ -81,7 +81,7 @@ int main() {
 		printf("\n"); //한줄 출력한 후에는 반드시 띄워주어야 엉키지 않습니다.
 	}
 	textcolor(14);
-	gotoxy(X, Y + 2);
+	gotoxy(X, Y + 2); // 4,5
 	printf("●");
 
 	while (1) {
@@ -90,9 +90,11 @@ int main() {
 		textcolor(14);
 		switch (test) { //입력받은 문자에 따라서 스위치문을 구성합니다.
 
-		case UP: gotoxy(X, Y + 2);;
+			// x=4, y=3
+		case UP: 
+			gotoxy(X, Y + 2);
 			printf(" ");//일단 지우고 시작합니다.
-			Y -= 1;//좌표를 이동시켜본뒤에
+			Y -= 1;//좌표를 이동시켜본뒤에  2
 
 			checker = keeper(map, X, Y);
 			//map배열 주소와 좌표를 넘겨줘 봅시다
