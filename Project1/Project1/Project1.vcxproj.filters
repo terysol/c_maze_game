@@ -36,5 +36,8 @@
     <ClCompile Include="반향키 연습.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="방향.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

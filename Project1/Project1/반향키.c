@@ -58,7 +58,7 @@ int main() {
 		{1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9} };
 	//2차원 배열을 적당히 초기화 시킨뒤
 
-	system("mode con cols=37 lines=24");
+	// system("mode con cols=37 lines=24");
 
 	gotoxy(4, 1); textcolor(15); printf("★★  미 로 찾 기 샘 플  ★★");
 	gotoxy(0, 2); //원하는 좌표로 가서
@@ -81,7 +81,7 @@ int main() {
 		printf("\n"); //한줄 출력한 후에는 반드시 띄워주어야 엉키지 않습니다.
 	}
 	textcolor(14);
-	gotoxy(X, Y + 2); // 4,5
+	gotoxy(X, Y + 2);
 	printf("●");
 
 	while (1) {
@@ -90,11 +90,9 @@ int main() {
 		textcolor(14);
 		switch (test) { //입력받은 문자에 따라서 스위치문을 구성합니다.
 
-			// x=4, y=3
-		case UP: 
-			gotoxy(X, Y + 2);
+		case UP: gotoxy(X, Y + 2);;
 			printf(" ");//일단 지우고 시작합니다.
-			Y -= 1;//좌표를 이동시켜본뒤에  2
+			Y -= 1;//좌표를 이동시켜본뒤에
 
 			checker = keeper(map, X, Y);
 			//map배열 주소와 좌표를 넘겨줘 봅시다

@@ -43,6 +43,7 @@ int main(void)
 
     while (1) //∞‘¿” start
     {
+        CursorView(0);
         print_mazeGame(maze, 12);
         move_maze(maze, &row, &col);
     }
