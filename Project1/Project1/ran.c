@@ -1,23 +1,54 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<time.h>
-#include<windows.h>
-#include<conio.h>
-
-#define XPOS 30
-#define YPOS 5
+#include <stdio.h>
+#include <stdlib.h>
+#include <windows.h>
+#include <conio.h>
+#include <time.h>
 
 #define LEFT 75
 #define RIGHT 77
 #define UP 72
 #define DOWN 80
 
-void CursorView(char show);
-void GotoXY(int x, int y);
-int GetKey();
+#define POINT_X 2
+#define POINT_Y 6
 
-int row = 25, col = 25;
+#define DELAY 100
+#define EXIT 50
+
 int** maze;
+int row = 25;    // 미로판 가로 크기
+int col = 25;   // 미로판 세로 크기
+int x = 1;  // 플레이어 가로 위치
+int y = 1;  // 플레이어 세로 위치
+
+void gotoxy(int x, int y);
+void removeCursor(void);
+COORD getCursor(void);
+struct room {
+	int r;
+	int c;
+}*unknown;
+
+struct candidate_room {
+	int r;
+	int c;
+	int d;
+}*candidate;
+void gotoxy(int x, int y) //콘솔 위에 커서 위치를 바꾸어 원하는 곳에 미로를 출력하기 위한 함수
+{
+	COORD pos = { x, y };
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+}
+
+COORD getCursor(void)
+{
+	COORD curPoint;
+	CONSOLE_SCREEN_BUFFER_INFO pos;
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &pos);
+	curPoint.X = pos.dwCursorPosition.X;
+	curPoint.Y = pos.dwCursorPosition.Y;
+	return curPoint;
+}
 
 void CursorView(char show) //커서를 없애는 함수
 {
@@ -29,39 +60,15 @@ void CursorView(char show) //커서를 없애는 함수
 	SetConsoleCursorInfo(hConsole, &ConsoleCursor);
 }
 
-void gotoxy(int x, int y) //콘솔 위에 커서 위치를 바꾸어 원하는 곳에 미로를 출력하기 위한 함수
-{
-	COORD pos = { x, y };
-	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
-}
-
-int GetKey() //키를 받아들이는 함수
-{
-	if (_kbhit() != 0) //키 입력이 유효할 경우
-	{
-		return _getch(); //입력한 키 반환
-	}
-
-	return 0; //그렇지 않을 경우 0반환
-}
-
 void print_maze(int** maze) //미로 frame(틀)을 그려주는 함수
 {
 	int i, j, k = 0;
+	COORD cur = getCursor();
 
 	int view_i, view_j, d, chk_cnt;
 	int move[4][2] = { {-2,0},{2,0},{0,-2},{0,2} };//상하좌우
 
-	struct room {
-		int r;
-		int c;
-	}*unknown;
-
-	struct candidate_room {
-		int r;
-		int c;
-		int d;
-	}*candidate;
+	
 
 	//2차원 배열처럼 사용할 maze 생성
 	maze = (int**)malloc(sizeof(int*) * row);
@@ -168,97 +175,123 @@ void print_maze(int** maze) //미로 frame(틀)을 그려주는 함수
 		}
 	}
 	maze[0][1] = 2;
-	//----------
-
-	// 옆에가 빈칸일 경우 1로 되기 
-
 	maze[13][23] = 3;
 
 
 	//미로를 출력함	
 
 	for (i = 0; i < row; i++) {
-		for (j = 0; j < col; j++) {
-			if (maze[i][j] == 0) printf("▦");
+		for (j = 0; j < col; j++) 
+		{
+			gotoxy(cur.X + (j * 2), cur.Y + i);
+			if (maze[i][j] == 0) printf("■");
 			else if (maze[i][j] == 3) printf("★");
 			else printf("　");
 		}
 		printf("\n");
 	}
-	gotoxy(1, 6);
-	printf("●");
+	gotoxy(cur.X, cur.Y);
 }
 
-
-int keeper(int** maze, int X, int Y) { //2차원 배열과 좌표를 받습니다.
-
-	int checker;
-
-	if (*(*(maze + Y) + X) == 0) { //야 간단히 검사만 하면 되겠네요? 그렇죠?
-		checker = 1;
-	} //좌표부분의 맵값이 0이면 1을 반환하고
-	else if (*(*(maze + Y) + X) == 2) {
-		checker = 1;
-	}
-	else { checker = 0; } //0이 아니면 지나다니면 안된다는듯으로 0을 반환시킬께요. 
-
-	return checker;
-}
-
-void move_maze(int** maze, int* row, int* col) //객체(게임 주인공?)을 움직이는 함수
+void showCharacter(void)
 {
+	COORD cur = getCursor();
 
+	printf("◎");
+	gotoxy(cur.X, cur.Y);
 
+	
 }
 
-int main(void) {
+int detect(int x, int y)
+{
+	int x1 = 0;
+	int y1 = 0;
 
-	//int row = 0, col = 1; //시작 위치 초기화
+	// 커서 위치 얻기 
+	COORD cur = getCursor();
 
+	// 미로내에서의 위치 계산.
+	x1 = cur.X + x;
+	y1 = cur.Y + y;
+	x1 = x1 / 2 - 2;
+	y1 = y1 - 2;
+
+	// 미로 밖에 있느냐?
+	if (!((x1 >= 0 && x1 < 25) && (y1 >= 0 && y1 < 25)))
+	{
+		return 1;
+	}
+
+	//배열을 넘어가지 않는이유?
+	if (maze[y1][x1] == 0)
+		return 1;
+	//미션성공
+	else if (maze[y1][x1] == 3)
+		return EXIT;
+	else
+		return 0;
+}
+
+void RemoveCharacter_Set(int x, int y)
+{
+	int value = detect(x, y);
+
+	if (value == 0)
+	{
+		COORD cur = getCursor();
+
+		printf("  ");
+		gotoxy(cur.X + x, cur.Y + y);
+		//showCharacter();
+	}
+	else if (value == EXIT)
+	{
+		gotoxy(10, 15);
+		printf("성공!");
+		system("pause");
+		exit(1);
+	}
+}
+
+void character_static(void)
+{
+	int kb;
+	gotoxy(4,6);  //케릭터 시작위치
+	while (1)
+	{
+		while (!_kbhit())
+		{
+			showCharacter();
+			//Sleep(DELAY);
+		}
+		kb = _getch();
+		switch (kb)
+		{
+		case UP:
+			RemoveCharacter_Set(0, -1);
+			break;
+		case DOWN:
+			RemoveCharacter_Set(0, 1);
+			break;
+		case RIGHT:
+			RemoveCharacter_Set(2, 0);
+			break;
+		case LEFT:
+			RemoveCharacter_Set(-2, 0);
+			break;
+		}
+
+	}
+}
+
+int main() {
+	
 	CursorView(0);
-
-	gotoxy(5, 5);
-	printf("미로 찾기 게임\n");
+	gotoxy(POINT_X, POINT_Y);
 	print_maze(maze);
 
-	int x = 1;
-	int y = 4;
-	while (1) //게임 start
-	{
-
-		int chr; //키를 받아들이기 위한 변수
-	//int i = *row; //1
-	//int j = *col; //0
-
-		int checker;
-
-		
-
-		chr = _getch();
-		switch (chr)
-		{
-
-		case DOWN:
-			gotoxy(x, y + 2);
-			printf(" ");
-			y += 1;
-			checker = keeper(maze, x, y);
-			if (checker == 1) {
-				gotoxy(x, y);
-				printf("●");
-				break;
-			}
-			else if (checker == 0) {
-				y -= 1;
-				gotoxy(x, y);
-				printf("●");
-				break;
-			}
-				
-
-			} // switch 문 끝
-		
-	}
-
-	return 0;
+	character_static(); //케릭터 움직이기
+	getchar();
+	
 }

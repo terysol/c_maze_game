@@ -6,9 +6,9 @@
 #define LEFT 75     //이런식으로 정의해두면 편하게 사용할 수 있습니다.
 #define RIGHT 77
 
-gotoxy(int x, int y) //gotoxy함수를 호출해올 기본함수.
+void gotoxy(int x, int y) //gotoxy함수를 호출해올 기본함수.
 {
-    COORD pos = { x, y };
+    COORD pos = { x, y };  // y는 2배한 값으로 콘솔에 찍힘.
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
 

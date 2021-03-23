@@ -18,12 +18,6 @@
     <ClCompile Include="반향키.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="main.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="random_maze.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="1.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -37,6 +31,18 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="방향.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="main.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="미로찾기 원리.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ran.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="maze_game.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

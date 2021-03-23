@@ -2,12 +2,13 @@
 #include<stdlib.h>
 #include<time.h>
 
-int main(void) {
+int** maze;
+void print_maze(void) {
 	int i, j, k = 0;
 	int row, col;
 	int view_i, view_j, d, chk_cnt;
 	int move[4][2] = { {-2,0},{2,0},{0,-2},{0,2} };//»óÇÏÁÂ¿ì
-	int** maze;
+	
 
 	struct room {
 		int r;
@@ -145,5 +146,9 @@ int main(void) {
 		}
 		printf("\n");
 	}
+}
+
+int main() {
+	print_maze();
 	return 0;
 }
