@@ -1,37 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <windows.h>
-#include <conio.h>
+#include "maze_game.h"
 
-#define MAZE_BOARD_HEIGHT 10
-#define MAZE_BOARD_WIDTH 6
-#define POINT_X 5  //보드 시작좌표 x
-#define POINT_Y 6  //보드 시작좌표 y
-
-#define LEFT 75
-#define RIGHT 77
-#define UP 72
-#define DOWN 80
-
-#define DELAY 100
-#define EXIT 50
-int row = 25;    // 미로판 가로 크기
-int col = 25;
-int num1 = 0;
-int num2 = 1;
-int* x1=&num1;
-int* y1=&num2;
-struct room {
-	int r;
-	int c;
-}*unknown;
-
-struct candidate_room {
-	int r;
-	int c;
-	int d;
-}*candidate;
-int** maze;
 
 void gotoxy(int x, int y)
 {
@@ -59,10 +27,34 @@ void removeCursor(void)
 	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cur);
 }
 
+enum boolean push(int x, int y) {
+	if (top >= MAX - 1) {
+		printf("stack overflow\n");
+		return false;
+	}
+	top += 1;
+	stack[top][0] = x;
+	stack[top][1] = y;
+	return true;
+}
+
+enum boolean pop(int* x, int* y) {
+	if (top == -1) {
+		printf("stack underflow\n");
+		return false;
+	}
+	*x = stack[top][0];
+	*y = stack[top][1];
+	top -= 1;
+	return true;
+}
+
 void showBoard(void)
 {
 	int i, j, k = 0;
 	COORD cur = getCursor();
+	int row = 25;    // 미로판 가로 크기
+	int col = 25;
 
 	int view_i, view_j, d, chk_cnt;
 	int move[4][2] = { {-2,0},{2,0},{0,-2},{0,2} };//상하좌우
@@ -215,20 +207,24 @@ int detect(int x, int y)
 		*y1 = *y1 + x;
 	}
 
-
 	// 미로 밖에 있느냐?
 	if (!((*x1 >= 0 && *x1 < 25) && (*y1 >= 0 && *y1 < 25)))
 	{
 		return 1;
 	}
 
-	//배열을 넘어가지 않는이유?
-	if (maze[*x1][*y1] == 0)
+	
+	if (maze[*x1][*y1] == 0) {   // 
+		*x1 -= y;
+		*y1 -= x;
 		return 1;
+	}
+
 	//미션성공
 	else if (maze[*x1][*y1] == 3)
 		return EXIT;
 	else
+		push(x1, y1);
 		return 0;
 }
 void RemoveCharacter_Set(int x, int y)
@@ -247,6 +243,7 @@ void RemoveCharacter_Set(int x, int y)
 	}
 	else if (value == EXIT)
 	{
+		system("cls");
 		gotoxy(55,20);
 		printf("성공!");
 		system("pause");
