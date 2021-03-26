@@ -55,15 +55,21 @@ void showBoard(void)
 	COORD cur = getCursor();
 	int row = 25;    // 미로판 가로 크기
 	int col = 25;
+	struct room {
+		int r;
+		int c;
+	}*unknown;
+
+	struct candidate_room {
+		int r;
+		int c;
+		int d;
+	}*candidate;
+
 
 	int view_i, view_j, d, chk_cnt;
 	int move[4][2] = { {-2,0},{2,0},{0,-2},{0,2} };//상하좌우
 
-
-
-	//2차원 배열처럼 사용할 maze 생성
-	maze = (int**)malloc(sizeof(int*) * row);
-	for (i = 0; i < row; i++) maze[i] = (int*)malloc(sizeof(int) * col);
 
 	//미로 방 전체 개수. 벽을 제외한 방의 개수 
 	chk_cnt = (row / 2) * (col / 2);
@@ -181,6 +187,8 @@ void showBoard(void)
 		}
 		printf("\n");
 	}
+	free(unknown);
+	free(candidate);
 	gotoxy(cur.X, cur.Y);
 }
 
@@ -224,7 +232,7 @@ int detect(int x, int y)
 	else if (maze[*x1][*y1] == 3)
 		return EXIT;
 	else
-		push(x1, y1);
+		//push(x1, y1);
 		return 0;
 }
 void RemoveCharacter_Set(int x, int y)
@@ -293,5 +301,4 @@ int main()
 
 	character_static(); //케릭터 움직이기
 	getchar();
-	//free(maze);
 }

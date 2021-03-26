@@ -20,22 +20,13 @@
 #define COL 25
 #define MAX ROW*COL
 
+
+int maze[25][25] = { 0, };
+int top = -1;
 int num1 = 0;
 int num2 = 1;
-int** maze;
-int top = -1;
 int* x1 = &num1;
 int* y1 = &num2;
 int stack[][2] = { 0, };
 enum boolean{false, true};
 
-struct room {
-	int r;
-	int c;
-}*unknown;
-
-struct candidate_room {
-	int r;
-	int c;
-	int d;
-}*candidate;
