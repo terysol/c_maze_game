@@ -21,8 +21,8 @@ void print_maze(void) {
 		int d;
 	}*candidate;
 
-	row = 25;
-	col = 25;
+	row = 21;
+	col = 21;
 
 	//2차원 배열처럼 사용할 maze 생성
 	maze = (int**)malloc(sizeof(int*) * row);
@@ -132,11 +132,11 @@ void print_maze(void) {
 	//----------
 
 	// 옆에가 빈칸일 경우 1로 되기 
-	maze[11][24] = 1;
+	/*maze[11][24] = 1;
 	maze[6][24] = 1;
 
 
-	maze[21][24] = 1;
+	maze[21][24] = 1;*/
 	//미로를 출력함 
 	printf("\n\n【Wilson's Algorithm】\n\n");
 	for (i = 0; i < row; i++) {
