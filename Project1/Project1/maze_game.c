@@ -27,34 +27,42 @@ void removeCursor(void)
 	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cur);
 }
 
-enum boolean push(int x, int y) {
-	if (top >= MAX - 1) {
-		printf("stack overflow\n");
-		return false;
-	}
-	top += 1;
-	stack[top][0] = x;
-	stack[top][1] = y;
-	return true;
-}
+void textcolor(int color_number)
 
-enum boolean pop(int* x, int* y) {
-	if (top == -1) {
-		printf("stack underflow\n");
-		return false;
-	}
-	*x = stack[top][0];
-	*y = stack[top][1];
-	top -= 1;
-	return true;
-}
-
-void showBoard(void)
 {
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color_number);
+}
+
+//enum boolean push(int x, int y) {
+//	if (top >= MAX - 1) {
+//		printf("stack overflow\n");
+//		return false;
+//	}
+//	top += 1;
+//	stack[top][0] = x;
+//	stack[top][1] = y;
+//	return true;
+//}
+//
+//enum boolean pop(int* x, int* y) {
+//	if (top == -1) {
+//		printf("stack underflow\n");
+//		return false;
+//	}
+//	*x = stack[top][0];
+//	*y = stack[top][1];
+//	top -= 1;
+//	return true;
+//}
+
+void showBoard(int row, int col)
+{
+	system("cls");
+	//int maze[row][col] = { 0, };
 	int i, j, k = 0;
 	COORD cur = getCursor();
-	int row = 25;    // 미로판 가로 크기
-	int col = 25;
+	//int row = 25;    // 미로판 가로 크기
+	//int col = 25;
 	struct room {
 		int r;
 		int c;
@@ -69,6 +77,10 @@ void showBoard(void)
 
 	int view_i, view_j, d, chk_cnt;
 	int move[4][2] = { {-2,0},{2,0},{0,-2},{0,2} };//상하좌우
+
+	//2차원 배열처럼 사용할 maze 생성
+	maze = (int**)malloc(sizeof(int*) * row);
+	for (i = 0; i < row; i++) maze[i] = (int*)malloc(sizeof(int) * col);
 
 
 	//미로 방 전체 개수. 벽을 제외한 방의 개수 
@@ -171,6 +183,7 @@ void showBoard(void)
 			unknown[j].c = unknown[chk_cnt].c;
 		}
 	}
+	
 	maze[0][1] = 2;
 	maze[13][23] = 3;
 
@@ -181,8 +194,13 @@ void showBoard(void)
 		for (j = 0; j < col; j++)
 		{
 			gotoxy(cur.X + (j * 2), cur.Y + i);
-			if (maze[i][j] == 0) printf("■");
-			else if (maze[i][j] == 3) printf("★");
+			if (maze[i][j] == 0) {
+				textcolor(8);
+				printf("■");
+			}else if (maze[i][j] == 3) { 
+				textcolor(12);  
+				printf("★"); 
+			}
 			else printf("　");
 		}
 		printf("\n");
@@ -197,12 +215,12 @@ void showCharacter(void)
 {
 	COORD cur = getCursor();
 
+	textcolor(14);
 	printf("●");
 	gotoxy(cur.X, cur.Y);
 }
 int detect(int x, int y)
 {
-	
 	 
 	// 커서 위치 얻기 
 	COORD cur = getCursor();  //(2,6)
@@ -224,7 +242,7 @@ int detect(int x, int y)
 	
 	if (maze[*x1][*y1] == 0) {   // 
 		*x1 -= y;
-		*y1 -= x;
+		*y1 -= (x-1);
 		return 1;
 	}
 
@@ -235,6 +253,7 @@ int detect(int x, int y)
 		//push(x1, y1);
 		return 0;
 }
+
 void RemoveCharacter_Set(int x, int y)
 {
 	int value = detect(x, y);
@@ -252,13 +271,16 @@ void RemoveCharacter_Set(int x, int y)
 	else if (value == EXIT)
 	{
 		system("cls");
-		gotoxy(55,20);
-		printf("성공!");
-		system("pause");
+		gotoxy(20,10);
+		for (int helper = 0; helper <= 15; helper++) {
+			gotoxy(10, 11); textcolor(helper); //막 승리했다고 띄워주면 마무리되겠죠?
+			printf("★탈출했습니다!★");
+			Sleep(100);
+			//system("pause");
+		}
 		exit(1);
 	}
 }
-
 
 void character_static(void)
 {
@@ -295,10 +317,50 @@ void character_static(void)
 
 int main()
 {
+	
+	system("cls");
 	removeCursor(); //커서 깜박이 지우기
-	gotoxy(POINT_X, POINT_Y); //보드 시작좌표   (4,2)
-	showBoard(); //미로판 보여주기
+	gotoxy(POINT_X, POINT_Y);
 
-	character_static(); //케릭터 움직이기
-	getchar();
+	showBoard(15, 15);
+	character_static();
+	/*int choose;
+
+	gotoxy(70, 10);
+	printf("1. 1단계 모드(15x15)\n");
+	gotoxy(70, 12);
+	printf("2. 2단계 모드(25x25)\n");
+	gotoxy(70, 14);
+	printf("3. 랭킹 보기\n");
+	gotoxy(70, 16);
+	printf("4. 종료 하기\n");
+
+	
+
+	while (1) {
+		gotoxy(70, 18);
+		printf("원하는 모드를 선택하세요 >> ");
+		scanf_s("%d", &choose);
+
+		switch (choose) {
+		case 1:
+			showBoard(15, 15);
+			character_static();
+			break;
+		case 2:
+			showBoard(25, 25);
+			character_static();
+			break;
+		case 3:
+			break;
+		case 4:
+			exit(1);
+		default:
+			gotoxy(70, 20);
+			printf("다시 입력해주세요.");
+			continue;
+		}
+	}*/
+	free(maze);
+	return 0;
 }
