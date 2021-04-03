@@ -1,30 +1,24 @@
 #include "maze_game.h"
 
-#define POINT_X 0  //보드 시작좌표 x
-#define POINT_Y 0  //보드 시작좌표 y
-
+// 키보드
 #define LEFT 75
 #define RIGHT 77
 #define UP 72
 #define DOWN 80
 
+// 기타 필요한 것
 #define DELAY 100
 #define EXIT 50
 
-#define ROW 25
-#define COL 25
-#define MAX ROW*COL
-
+// 전역변수
 int** maze;
-//int maze[][25];
-//int top = -1;
 int num1 = 0;
 int num2 = 1;
 int* x1 = &num1;
 int* y1 = &num2;
 int score = 0;
-//int stack[][2] = { 0, };
-//enum boolean{false, true};
+
+// 함수 선언
 COORD getCursor(void);
 void removeCursor(void);
 void textcolor(int color_number);
@@ -34,7 +28,7 @@ int detect(int x, int y);
 void RemoveCharacter_Set(int x, int y);
 void character_static(void);
 
-
+// 움직이기
 void gotoxy(int x, int y)
 {
 	COORD pos;
@@ -43,6 +37,7 @@ void gotoxy(int x, int y)
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
 
+// 현재 커서 위치 가져오기
 COORD getCursor(void)
 {
 	COORD curPoint;
@@ -53,6 +48,7 @@ COORD getCursor(void)
 	return curPoint;
 }
 
+// 커서 없애기
 void removeCursor(void)
 {
 	CONSOLE_CURSOR_INFO cur;
@@ -61,43 +57,21 @@ void removeCursor(void)
 	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cur);
 }
 
+// 색 변화주기
 void textcolor(int color_number)
 
 {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color_number);
 }
 
-//enum boolean push(int x, int y) {
-//	if (top >= MAX - 1) {
-//		printf("stack overflow\n");
-//		return false;
-//	}
-//	top += 1;
-//	stack[top][0] = x;
-//	stack[top][1] = y;
-//	return true;
-//}
-//
-//enum boolean pop(int* x, int* y) {
-//	if (top == -1) {
-//		printf("stack underflow\n");
-//		return false;
-//	}
-//	*x = stack[top][0];
-//	*y = stack[top][1];
-//	top -= 1;
-//	return true;
-//}
 
-// show maze board (kimsolmin 21-03-18)
+// 미로 랜덤 생성 (kimsolmin 21-03-18)
 void showBoard(int row, int col)
 {
 	system("cls");
-	//int maze[row][col] = { 0, };
 	int i, j, k = 0;
 	COORD cur = getCursor();
-	//int row = 25;    // 미로판 가로 크기
-	//int col = 25;
+	
 	struct room {
 		int r;
 		int c;
@@ -111,7 +85,7 @@ void showBoard(int row, int col)
 
 
 	int view_i, view_j, d, chk_cnt;
-	int move[4][2] = { {-2,0},{2,0},{0,-2},{0,2} };//상하좌우
+	int move[4][2] = { {-2,0},{2,0},{0,-2},{0,2} }; //상하좌우
 
 	//2차원 배열처럼 사용할 maze 생성
 	maze = (int**)malloc(sizeof(int*) * row);
@@ -187,6 +161,7 @@ void showBoard(int row, int col)
 				maze[i][j] = 2;
 			}
 			else if (maze[view_i][view_j] == 1)break; //미로를 만나면 빠져나감
+
 			else { //maze[view_i][view_j] == 2 일 때, 후보 미로를 만났으므로 사이클을 제거함
 				//이전 후보
 				k--;
@@ -200,6 +175,7 @@ void showBoard(int row, int col)
 				j = view_j;
 			}
 		}
+
 		//임의 지점에서 미로를 만난 지점까지 미로 표시하고 미로방마다 미지리스트에서 제거함 
 		for (i = 0; i < k; i++) {
 			maze[candidate[i].r][candidate[i].c] = 1;
@@ -218,31 +194,42 @@ void showBoard(int row, int col)
 			unknown[j].c = unknown[chk_cnt].c;
 		}
 	}
+	// 동적할당 후 free()
 	free(unknown);
 	free(candidate);
 	
-	maze[0][1] = 2;
-	
+	// 시작 배열 좌표
+	maze[0][1] = 2;   
 
-	if (row == 15) {
-		maze[9][13] = 3;
+	// 미로 크기에 따라 ♥ 위치 다르게 설정
+	if (row == 21) {
+		maze[13][19] = 3;
+		for (int i = 0; i < row; i+=3) {
+			for (int j = 0; j < row; j+=5) {
+				if (maze[i][j] != 0) {
+					maze[i][j] = 4;
+				}
+			}
+		}
 		maze[5][5] = 4;
-		maze[9][10] = 4;
 	}
 	else if (row == 25) {
 		maze[13][23] = 3;
-		maze[5][5] = 4;
-		maze[9][11] = 4;
+		for (int i = 0; i < row; i += 3) {
+			for (int j = 0; j < row; j += 5) {
+				if (maze[i][j] != 0) {
+					maze[i][j] = 4;
+				}
+			}
+		}
 	}
 	
 
 	//미로를 출력함	
-
 	for (i = 0; i < row; i++) {
 		for (j = 0; j < col; j++)
 		{
-
-			gotoxy(cur.X + (j * 2), cur.Y + i);
+			gotoxy(40 + (j * 2), 10 + i);
 			if (maze[i][j] == 0) {
 				textcolor(8);
 				printf("■");
@@ -258,18 +245,31 @@ void showBoard(int row, int col)
 		}
 		printf("\n");
 	}
+
+	// 세부 정보 출력(21-04-02)
 	textcolor(15);
-	gotoxy(55, 15);
+	gotoxy(130, 15);
 	printf("점수 : %d", score);
-	gotoxy(55, 17);
-	printf("♥ : 점수 10점씩");
-	gotoxy(55, 19);
-	printf("★ : 출입구");
+
+	gotoxy(130, 17);
+	textcolor(9);
+	printf("♥");
+	gotoxy(132, 17);
+	textcolor(15);
+	printf(" : 점수");
+
+	gotoxy(130, 19);
+	textcolor(12);
+	printf("★ ");
+	gotoxy(132, 19);
+	textcolor(15);
+	printf(" : 출구");
+	
 	
 	gotoxy(cur.X, cur.Y);
 }
 
-
+// ● 출력 (21-03-29)
 void showCharacter(void)
 {
 	COORD cur = getCursor();
@@ -278,16 +278,12 @@ void showCharacter(void)
 	printf("●");
 	gotoxy(cur.X, cur.Y);
 }
+
 int detect(int x, int y)
 {
-	/*gotoxy(55, 30);
-	printf("             ");
-	gotoxy(55, 30);
-	printf("%d, %d", *x1, *y1);*/
-
-	//int row = 15, col = 15;
+	
 	// 커서 위치 얻기 
-	COORD cur = getCursor();  //(2,6)
+	COORD cur = getCursor();  
 	if (x == 2) {
 		*x1 = *x1 + y;
 		*y1=*y1+1;
@@ -303,14 +299,14 @@ int detect(int x, int y)
 
 	
 
-	// 미로 밖에 있느냐?
+	// 미로의 범위를 벗어났을 때
 	if (!((*x1 >= 0 && *x1 < 25) && (*y1 >= 0 && *y1 < 25)))
 	{
 		return 1;
 	}
 
 	
-	if (maze[*x1][*y1] == 0) {   // 
+	if (maze[*x1][*y1] == 0) {   // 벽일 때
 		if (x == 2) {
 			*x1 = *x1 - y;
 			*y1 = *y1 - 1;
@@ -326,19 +322,22 @@ int detect(int x, int y)
 		return 1;
 	}
 
-	//미션성공
+	// ★(출구)에 도착했을 때
 	else if (maze[*x1][*y1] == 3) {
 		system("cls");
-		gotoxy(20, 10);
+		gotoxy(100,50);
 		for (int helper = 0; helper <= 15; helper++) {
-			gotoxy(10, 11); textcolor(helper); //막 승리했다고 띄워주면 마무리되겠죠?
+			gotoxy(100, 10); textcolor(helper); //막 승리했다고 띄워주면 마무리되겠죠?
 			printf("★탈출했습니다!★");
 			Sleep(100);
 			//system("pause");
 		}
+		gotoxy(100, 12);
+		printf("점수 : %d", score);
 		exit(1);
 	}
-		
+	
+	// ♥(점수)를 얻었을 때
 	else if (maze[*x1][*y1] == 4) {
 		score += 10;
 		COORD cur = getCursor();
@@ -346,25 +345,21 @@ int detect(int x, int y)
 		printf("  ");
 		gotoxy(cur.X + x, cur.Y + y);
 
-		gotoxy(61, 15);
+		gotoxy(136, 15);
+		textcolor(10);
 		printf("%d", score);
 		gotoxy(cur.X + x, cur.Y + y);
-		//gotoxy(cur.X + y, cur.Y + x);
-		//printf("  ");
-		//gotoxy(cur.X + y, cur.Y + x);
 	}
 		
-	else
-		//push(x1, y1);
+	else     // 벽이 아닐 때
 		return 0;
 }
 
+// ●(캐릭터) 잔상 없애기 (21-03-19)
 void RemoveCharacter_Set(int x, int y)
 {
 	int value = detect(x, y);
 
-	/*gotoxy(60, 25);
-	printf("%d",value);*/
 	if (value == 0)
 	{
 		COORD cur = getCursor();
@@ -375,10 +370,11 @@ void RemoveCharacter_Set(int x, int y)
 	}
 }
 
+// ●(캐릭터) 움직이기(21-03-19)
 void character_static(void)
 {
 	int kb;
-	gotoxy(2,0);  //케릭터 시작위치
+	gotoxy(42,10);  //케릭터 시작위치
 	while (1)
 	{
 		while (!_kbhit())
@@ -393,19 +389,14 @@ void character_static(void)
 			RemoveCharacter_Set(0, -1);
 			break;
 		case DOWN:
-			
 			RemoveCharacter_Set(0, 1);
-			
 			break;
 		case RIGHT:
-			
 			RemoveCharacter_Set(2, 0);
 			
 			break;
 		case LEFT:
-			
 			RemoveCharacter_Set(-2, 0);
-			
 			break;
 		}
 
@@ -416,14 +407,11 @@ void character_static(void)
 
 int main()
 {
-	system("mode con:cols=150 lines=60");
+	system("mode con:cols=240 lines=60");
 	system("title mazeGame");
 	system("cls");
-	removeCursor(); //커서 깜박이 지우기
+	removeCursor(); 
 
-	gotoxy(POINT_X, POINT_Y);
-
-	//character_static();
 	int choose;
 
 	gotoxy(70, 10);
@@ -431,10 +419,7 @@ int main()
 	gotoxy(70, 12);
 	printf("2. 2단계 모드(25x25)\n");
 	gotoxy(70, 14);
-	printf("3. 랭킹 보기\n");
-	gotoxy(70, 16);
-	printf("4. 종료 하기\n");
-
+	printf("3. 종료 하기\n");
 	
 
 	while (1) {
@@ -444,16 +429,14 @@ int main()
 
 		switch (choose) {
 		case 1:
-			showBoard(15, 15);
+			showBoard(21,21);
 			character_static();
 			break;
 		case 2:
-			showBoard(25, 25);
+			showBoard(25,25);
 			character_static();
 			break;
 		case 3:
-			break;
-		case 4:
 			exit(1);
 		default:
 			gotoxy(70, 20);
@@ -461,6 +444,7 @@ int main()
 			continue;
 		}
 	}
+	// 동적 할당 후 free()
 	free(**maze);
 	return 0;
 }
