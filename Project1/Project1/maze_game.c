@@ -341,6 +341,7 @@ int detect(int x, int y)
 	else if (maze[*x1][*y1] == 4) {
 		score += 10;
 		COORD cur = getCursor();
+		maze[*x1][*y1] = 5;
 
 		printf("  ");
 		gotoxy(cur.X + x, cur.Y + y);
